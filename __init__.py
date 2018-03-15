@@ -60,11 +60,10 @@ filtered_df = filtered_df.drop('Assembly', 1)
 # For the testing purpose
 test_df = filtered_df.head(10)
 filtered_df = test_df
-logging.debug('First 3 dataframe rows: %s', filtered_df.head(3))
 #
+logging.debug('First 3 dataframe rows: %s', filtered_df.head(3))
 
 # Make folders and download files
-# TODO? Maybe it would be better to sort the data before iterating
 for index, row in filtered_df.iterrows():
     # TODO Check a free space on a drive
 
@@ -77,7 +76,6 @@ for index, row in filtered_df.iterrows():
     # Check a file existing and md5
     if not os.path.isfile(file_location) or is_file_changed(file_location, row['md5sum']):
         logging.info('Downloading a file to %s', file_location)
-        # TODO? zip old data if md5 is not the same
         os.makedirs(os.path.dirname(file_location), exist_ok=True)
         download(row['File download URL'], file_location)
         print(get_uncompressed_size(os.path.abspath(file_location)))
