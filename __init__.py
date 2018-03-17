@@ -3,16 +3,11 @@ import hashlib
 import urllib
 import shutil
 from multiprocessing.dummy import Pool
-
 import pandas as pd
 import os
 import logging
 import datetime
 import sys
-
-from multiprocessing import Process
-
-from multiprocessing import Queue
 
 from StreamToLogger import StreamToLogger
 
@@ -46,6 +41,16 @@ def gunzip(file_path, output_path):
     with gzip.open(file_path, "rb") as f_in, open(output_path, "wb") as f_out:
         shutil.copyfileobj(f_in, f_out)
     logging.info('The file %s unzipped', output_path)
+
+
+space_to_save = 20 * 1024 * 1024 * 1024  # 20GB
+data_dir = 'data'                      # A root data dir
+words_splitter = '__'
+file_extension = '.bed'
+zipfile_extension = '.gz'
+first_hierarchy_dir = 'Biosample type'
+second_hierarchy_dir = 'Output type'
+third_hierarchy_dir = 'Experiment accession'
 
 
 def build_tree(row):
@@ -85,22 +90,9 @@ metadata_file = './input_data/metadata.tsv'
 columns = ['File accession', 'Output type', 'Experiment accession', 'Biosample type', 'Derived from',
            'Size', 'md5sum', 'File download URL', 'Assembly']
 assembly = 'hg19'
-first_hierarchy_dir = 'Biosample type'
-second_hierarchy_dir = 'Output type'
-third_hierarchy_dir = 'Experiment accession'
 
 
-# Create a root dir
-#data_dir = sys.argv[0]
-#available_memory_volume = sys.argv[1]
-#available_memory_volume = sys.argv[1]
-space_to_save = 20 * 1024 * 1024 * 1024  # 20GB
-data_dir = './data'
-words_splitter = '__'
-file_extension = '.bed'
-zipfile_extension = '.gz'
-
-os.makedirs(os.path.dirname(data_dir), exist_ok=True)
+os.makedirs(os.path.join(os.getcwd(), data_dir), exist_ok=True)
 logging.debug('Data dir: %s', data_dir)
 
 # Filter the DataFrame
@@ -118,7 +110,7 @@ logging.debug('First 3 dataframe rows: %s', filtered_df.head(3))
 rows = []
 for index, row in filtered_df.iterrows():
     rows.append(row)
-pool = Pool(6)  # The pool of 6 processes
+pool = Pool(10)  # The pool of 10 processes
 pool.map(build_tree, rows)
 pool.close()
 pool.join()
