@@ -44,7 +44,7 @@ def gunzip(file_path, output_path):
 
 
 space_to_save = 20 * 1024 * 1024 * 1024  # 20GB
-data_dir = 'data'                      # A root data dir
+data_dir = '/data/encode/data_dir'                      # A root data dir
 words_splitter = '__'
 file_extension = '.bed'
 zipfile_extension = '.gz'
@@ -92,7 +92,7 @@ columns = ['File accession', 'Output type', 'Experiment accession', 'Biosample t
 assembly = 'hg19'
 
 
-os.makedirs(os.path.join(os.getcwd(), data_dir), exist_ok=True)
+os.makedirs(data_dir, exist_ok=True)
 logging.debug('Data dir: %s', data_dir)
 
 # Filter the DataFrame
@@ -101,7 +101,7 @@ filtered_df = df[df['Assembly'] == assembly]
 filtered_df = filtered_df.drop('Assembly', 1)
 
 # For the testing purpose
-test_df = filtered_df.head(10)
+test_df = filtered_df.head(5)
 filtered_df = test_df
 #
 logging.debug('First 3 dataframe rows: %s', filtered_df.head(3))
