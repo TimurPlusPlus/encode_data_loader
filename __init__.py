@@ -101,8 +101,8 @@ filtered_df = df[df['Assembly'] == assembly]
 filtered_df = filtered_df.drop('Assembly', 1)
 
 # For the testing purpose
-test_df = filtered_df.head(5)
-filtered_df = test_df
+#test_df = filtered_df.head(5)
+#filtered_df = test_df
 #
 logging.debug('First 3 dataframe rows: %s', filtered_df.head(3))
 
