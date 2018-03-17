@@ -34,6 +34,7 @@ third_hierarchy_dir = 'Experiment accession'
 # Create a root dir
 #data_dir = sys.argv[0]
 #available_memory_volume = sys.argv[1]
+available_memory_volume = sys.argv[1]
 #saved_memory_volume = sys.argv[2]
 data_dir = './data'
 words_splitter = '__'
