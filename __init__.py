@@ -2,18 +2,26 @@ import gzip
 import hashlib
 import urllib
 import shutil
+from multiprocessing.dummy import Pool
+
 import pandas as pd
 import os
 import logging
 import datetime
 import sys
 
+from multiprocessing import Process
+
+from multiprocessing import Queue
+
+from StreamToLogger import StreamToLogger
+
 
 def download(url, file_name):
-    logging.info('Downloading an archive to %s', zipfile_location)
+    logging.info('Downloading an archive to %s', file_name)
     with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
         shutil.copyfileobj(response, out_file)
-    logging.info('The archive downloaded')
+    logging.info('The archive %s downloaded', file_name)
 
 
 def get_md5(file_name):
@@ -28,27 +36,51 @@ def is_file_changed(file_name, md5):
     return get_md5(file_name) != md5
 
 
-def get_uncompressed_size(file_name):
-    with open(file_name, 'r') as fileobj:
-        isize = gzip.read32(fileobj)  # may exceed 2GB
-    return isize
-
-
 def get_device_available_space(dir_location):
     disk = os.statvfs(dir_location)
     return float(disk.f_bsize * disk.f_bfree)
 
 
 def gunzip(file_path, output_path):
-    logging.info('Unzipping a file to %s', file_location)
+    logging.info('Unzipping a file to %s', output_path)
     with gzip.open(file_path, "rb") as f_in, open(output_path, "wb") as f_out:
         shutil.copyfileobj(f_in, f_out)
-    logging.info('The file unzipped')
+    logging.info('The file %s unzipped', output_path)
+
+
+def build_tree(row):
+    # Check a free space on a drive
+    if get_device_available_space(data_dir) < space_to_save:
+        logging.error('The device available space is over')
+        logging.info('The script work finished at %s', datetime.datetime.now())
+        exit(1)
+    file_location = os.path.join(data_dir,
+                                 row[first_hierarchy_dir].replace(' ', words_splitter),
+                                 row[second_hierarchy_dir].replace(' ', words_splitter),
+                                 row[third_hierarchy_dir].replace(' ', words_splitter),
+                                 row['File accession'].replace(' ', words_splitter) + file_extension)
+    # Check a file existing
+    if not os.path.isfile(file_location):
+        zipfile_location = file_location + zipfile_extension
+        # Check the archive md5sum
+        if not os.path.isfile(zipfile_location) or is_file_changed(zipfile_location, row['md5sum']):
+            os.makedirs(os.path.dirname(zipfile_location), exist_ok=True)
+            download(row['File download URL'], zipfile_location)
+        gunzip(zipfile_location, file_location)
+        os.remove(zipfile_location)
+
 
 # A logger configuration
 logging.basicConfig(filename='./data_loader.log', format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
+stdout_logger = logging.getLogger('STDOUT')
+sl = StreamToLogger(stdout_logger, logging.INFO)
+sys.stdout = sl
+stderr_logger = logging.getLogger('STDERR')
+sl = StreamToLogger(stderr_logger, logging.ERROR)
+sys.stderr = sl
 
-logging.info('The script started at %s', datetime.datetime.now())
+start_time = datetime.datetime.now()
+logging.info('The script started at %s', start_time)
 metadata_file = './input_data/metadata.tsv'
 columns = ['File accession', 'Output type', 'Experiment accession', 'Biosample type', 'Derived from',
            'Size', 'md5sum', 'File download URL', 'Assembly']
@@ -82,29 +114,17 @@ filtered_df = test_df
 #
 logging.debug('First 3 dataframe rows: %s', filtered_df.head(3))
 
-# Make folders and download files
+# Collect all rows to send to multiprocessing
+rows = []
 for index, row in filtered_df.iterrows():
-    # Check a free space on a drive
-    if get_device_available_space(data_dir) < space_to_save:
-        logging.error('The device available space is over')
-        logging.info('The script work finished at %s', datetime.datetime.now())
-        exit(1)
-    file_location = os.path.join(data_dir,
-                                 row[first_hierarchy_dir].replace(' ', words_splitter),
-                                 row[second_hierarchy_dir].replace(' ', words_splitter),
-                                 row[third_hierarchy_dir].replace(' ', words_splitter),
-                                 row['File accession'].replace(' ', words_splitter) + file_extension)
-    # Check a file existing
-    if not os.path.isfile(file_location):
-        zipfile_location = file_location + zipfile_extension
-        # Check the archive md5sum
-        if not os.path.isfile(zipfile_location) or is_file_changed(zipfile_location, row['md5sum']):
-            os.makedirs(os.path.dirname(zipfile_location), exist_ok=True)
-            download(row['File download URL'], zipfile_location)
-        gunzip(zipfile_location, file_location)
-        os.remove(zipfile_location)
+    rows.append(row)
+pool = Pool(6)  # The pool of 6 processes
+pool.map(build_tree, rows)
+pool.close()
+pool.join()
 
-logging.info('The script work finished at %s', datetime.datetime.now())
+finish_time = datetime.datetime.now()
+logging.info('The script work took %.2f seconds', (finish_time - start_time).total_seconds())
 
 
 
