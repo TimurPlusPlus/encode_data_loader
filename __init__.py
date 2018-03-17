@@ -10,8 +10,10 @@ import sys
 
 
 def download(url, file_name):
+    logging.info('Downloading an archive to %s', zipfile_location)
     with urllib.request.urlopen(url) as response, open(file_name, 'wb') as out_file:
         shutil.copyfileobj(response, out_file)
+    logging.info('The archive downloaded')
 
 
 def get_md5(file_name):
@@ -23,7 +25,7 @@ def get_md5(file_name):
 
 
 def is_file_changed(file_name, md5):
-    return get_md5(file_name) == md5
+    return get_md5(file_name) != md5
 
 
 def get_uncompressed_size(file_name):
@@ -38,8 +40,10 @@ def get_device_available_space(dir_location):
 
 
 def gunzip(file_path, output_path):
+    logging.info('Unzipping a file to %s', file_location)
     with gzip.open(file_path, "rb") as f_in, open(output_path, "wb") as f_out:
         shutil.copyfileobj(f_in, f_out)
+    logging.info('The file unzipped')
 
 # A logger configuration
 logging.basicConfig(filename='./data_loader.log', format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
@@ -85,25 +89,19 @@ for index, row in filtered_df.iterrows():
         logging.error('The device available space is over')
         logging.info('The script work finished at %s', datetime.datetime.now())
         exit(1)
-
     file_location = os.path.join(data_dir,
                                  row[first_hierarchy_dir].replace(' ', words_splitter),
                                  row[second_hierarchy_dir].replace(' ', words_splitter),
                                  row[third_hierarchy_dir].replace(' ', words_splitter),
                                  row['File accession'].replace(' ', words_splitter) + file_extension)
-
-    # Check a file existing and md5
-    if not os.path.isfile(file_location):  # or is_file_changed(file_location, row['md5sum']):
+    # Check a file existing
+    if not os.path.isfile(file_location):
         zipfile_location = file_location + zipfile_extension
-        logging.info('Downloading an archive to %s', zipfile_location)
-        os.makedirs(os.path.dirname(zipfile_location), exist_ok=True)
-        download(row['File download URL'], zipfile_location)
-        logging.info('The file downloaded')
-        logging.info('Unzipping a file to %s', file_location)
-        # Unzip the file
+        # Check the archive md5sum
+        if not os.path.isfile(zipfile_location) or is_file_changed(zipfile_location, row['md5sum']):
+            os.makedirs(os.path.dirname(zipfile_location), exist_ok=True)
+            download(row['File download URL'], zipfile_location)
         gunzip(zipfile_location, file_location)
-        logging.info('The file unzipped')
-        # Delete the archive
         os.remove(zipfile_location)
 
 logging.info('The script work finished at %s', datetime.datetime.now())
