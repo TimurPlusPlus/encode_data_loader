@@ -29,13 +29,38 @@ def calculate_correlation(df1, df2):
     return cor
 
 
+stems = ["S15-30_L0-10_M5", "S16-50_L0-10_M3", "S6-15_L0-10_M1"]
+
+
 def save_correlation_plot(summary_df, save_dir):
-    #summary_df.sort_values(['stem_name', 'chr'])
+    sns.set()
     for stem in stems:
+        fig, ax = plt.subplots()
+        ax.set_xticklabels(ax.get_xticklabels(), rotation=30)
+
+        fig.set_size_inches(11.7, 8.27)
+
         stem_summary_df = summary_df[summary_df['stem_name'] == stem]
-        stem_summary_df.sort_values(['chr'])
-        ax = sns.barplot(x="chromosome", y="correlation", data=stem_summary_df["chr", "corr"])
-        ax.savefig(os.path.join(save_dir, stem + ".png"))
+        stem_summary_df = sort_df(stem_summary_df)
+
+        pal = sns.color_palette("coolwarm", len(stem_summary_df['chr']))
+        rank = stem_summary_df['corr'].argsort().argsort()
+        sorted_palette = [pal[i] for i in rank]
+
+        sns.barplot(x="chr", y="corr", data=stem_summary_df[["chr", "corr"]],
+                    palette=sorted_palette)
+        path_to_save = os.path.join(save_dir, stem + ".png")
+        fig.savefig(path_to_save)
+        logging.info("A figure saved to %s", path_to_save)
+
+
+order = ['chr'+str(i) for i in range(1, 23)]
+order.extend(['chrX', 'chrY'])
+
+
+def sort_df(df):
+    df['chr'] = pd.Categorical(df['chr'], order)
+    return df.sort_values(['chr'])
 
 
 # A logger configuration
@@ -47,32 +72,37 @@ logging.info('The correlation calculation script started at %s', start_time)
 transcription_dir = "./data"
 stem_dir = "./stems"
 coverage_name_pattern = re.compile("coverage_table_(chr.*)_\.bed")
-stems = ["JKD21_KUKU", "Z228X3"]
-stem_locations = {"JKD21_KUKU": "./stems/JKD21_KUKU"}   # Stem-loops locations
+stem_locations = {"S15-30_L0-10_M5": "./stems/S15-30_L0-10_M5",
+                  "S16-50_L0-10_M3": "./stems/S16-50_L0-10_M3",
+                  "S6-15_L0-10_M1": "./stems/S6-15_L0-10_M1"}   # Stem-loops locations
 
+# Walk through all subdirs in dir
 for path, dirs, files in os.walk(transcription_dir):
+    # Data frame to aggregate correlations for some assay with all stem-loops
+    summary_df = pd.DataFrame(columns=["chr", "stem_name", "corr"])
     for file in files:
-        if coverage_name_pattern.match(file):   # Find coverage files
-            summary_df = pd.DataFrame(columns=["chr", "stem_name", "corr"])
-
+        # Find coverage files
+        if coverage_name_pattern.match(file):
             path_to_transcription = os.path.join(path, file)
             transcription_df = pd.read_csv(path_to_transcription, sep='\t',
-                                           usecols=[1, -1],              # Read start position and coverage
+                                           usecols=[1, 2],              # Read start position and coverage
                                            names=["start", "trans"])
             logging.info("Transcription factor coverage file %s", path_to_transcription)
 
             for stem_name, stem_location in stem_locations.items():
                 path_to_stem = os.path.join(stem_location, file)    # Get stem coverage file by chr name
                 stem_df = pd.read_csv(path_to_stem, sep='\t',
-                                      usecols=[1, -1],
+                                      usecols=[1, 3],
                                       names=["start", "stem"])
                 logging.info("Stem-loop coverage file %s", path_to_stem)
+
                 cor = calculate_correlation(transcription_df, stem_df)
-                chr_name = coverage_name_pattern.match(file).group(0)
-                summary_df = summary_df.append(pd.DataFrame({'chr': chr_name,
-                                                             "stem_name": stem_name,
-                                                             "corr": cor[0][1]}))
-            save_correlation_plot(summary_df, path)
+                chr_name = coverage_name_pattern.match(file).group(1)   # Chromosome name
+                summary_df = summary_df.append(pd.DataFrame({'chr': [chr_name],
+                                                             "stem_name": [stem_name],
+                                                             "corr": [cor['trans']['stem']]}))
+    if not summary_df.empty:
+        save_correlation_plot(summary_df, path)
 
 finish_time = datetime.datetime.now()
 logging.info('The correlation calculation script finished at %s', finish_time)
