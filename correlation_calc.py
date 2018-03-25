@@ -1,46 +1,44 @@
 import os
 import re
 import datetime
-#from StreamToLogger import StreamToLogger
-#import logging
+from StreamToLogger import StreamToLogger
+import logging
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-#import sys
+sns.set()
+import sys
 
 
 def configure_logger():
-    pass
-    #logging.basicConfig(filename='./data_loader.log',
-    #                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    #                    level=logging.DEBUG)
-    #stdout_logger = logging.getLogger('STDOUT')
-    #sl = StreamToLogger(stdout_logger, logging.INFO)
-    #sys.stdout = sl
-    #stderr_logger = logging.getLogger('STDERR')
-    #sl = StreamToLogger(stderr_logger, logging.ERROR)
-    #sys.stderr = sl
+    logging.basicConfig(filename='./data_loader.log',
+                        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                        level=logging.DEBUG)
+    stdout_logger = logging.getLogger('STDOUT')
+    sl = StreamToLogger(stdout_logger, logging.INFO)
+    sys.stdout = sl
+    stderr_logger = logging.getLogger('STDERR')
+    sl = StreamToLogger(stderr_logger, logging.ERROR)
+    sys.stderr = sl
 
 
 def calculate_correlation(df1, df2):
     correlation_df = pd.merge(df1, df2, on="start")
     correlation_df = correlation_df[["trans", "stem"]]
     cor = correlation_df.corr(method='pearson')
-    #logging.debug("The correlation table: %s", cor)
+    logging.debug("The correlation table: %s", cor)
     return cor
 
 
 stems = ["S15-30_L0-10_M5", "S16-50_L0-10_M3", "S6-15_L0-10_M1"]
 
+fig, ax = plt.subplots()
+fig.set_size_inches(11.7, 8.27)
 
 def save_correlation_plot(summary_df, save_dir):
-    sns.set()
+    summary_df.to_csv(os.path.join(save_dir, "correlations.csv"), sep='\t', index=False)
     for stem in stems:
-        fig, ax = plt.subplots()
-        ax.set_xticklabels(ax.get_xticklabels(), rotation=30)
-
-        fig.set_size_inches(11.7, 8.27)
-
+        plt.clf()
         stem_summary_df = summary_df[summary_df['stem_name'] == stem]
         stem_summary_df = sort_df(stem_summary_df)
 
@@ -48,11 +46,12 @@ def save_correlation_plot(summary_df, save_dir):
         rank = stem_summary_df['corr'].argsort().argsort()
         sorted_palette = [pal[i] for i in rank]
 
-        sns.barplot(x="chr", y="corr", data=stem_summary_df[["chr", "corr"]],
-                    palette=sorted_palette)
+        ax = sns.barplot(x="chr", y="corr", data=stem_summary_df[["chr", "corr"]],
+                         palette=sorted_palette)
+        ax.set_xticklabels(ax.get_xticklabels(), rotation=30)
         path_to_save = os.path.join(save_dir, stem + ".png")
         fig.savefig(path_to_save)
-        #logging.info("A figure saved to %s", path_to_save)
+        logging.info("A figure saved to %s", path_to_save)
 
 
 order = ['chr'+str(i) for i in range(1, 23)]
@@ -68,8 +67,7 @@ def sort_df(df):
 configure_logger()
 
 start_time = datetime.datetime.now()
-print(start_time)
-#logging.info('The correlation calculation script started at %s', start_time)
+logging.info('The correlation calculation script started at %s', start_time)
 
 transcription_dir = "./data"
 stem_dir = "./stems"
@@ -89,14 +87,14 @@ for path, dirs, files in os.walk(transcription_dir):
             transcription_df = pd.read_csv(path_to_transcription, sep='\t',
                                            usecols=[1, 2],              # Read start position and coverage
                                            names=["start", "trans"])
-            #logging.info("Transcription factor coverage file %s", path_to_transcription)
+            logging.info("Transcription factor coverage file %s", path_to_transcription)
 
             for stem_name, stem_location in stem_locations.items():
                 path_to_stem = os.path.join(stem_location, file)    # Get stem coverage file by chr name
                 stem_df = pd.read_csv(path_to_stem, sep='\t',
                                       usecols=[1, 3],
                                       names=["start", "stem"])
-                #logging.info("Stem-loop coverage file %s", path_to_stem)
+                logging.info("Stem-loop coverage file %s", path_to_stem)
 
                 cor = calculate_correlation(transcription_df, stem_df)
                 chr_name = coverage_name_pattern.match(file).group(1)   # Chromosome name
@@ -107,5 +105,4 @@ for path, dirs, files in os.walk(transcription_dir):
         save_correlation_plot(summary_df, path)
 
 finish_time = datetime.datetime.now()
-print(finish_time)
-#logging.info('The correlation calculation script finished at %s', finish_time)
+logging.info('The correlation calculation script finished at %s', finish_time)
