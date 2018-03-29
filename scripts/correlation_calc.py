@@ -1,11 +1,14 @@
+import datetime
+import logging
 import os
 import re
-import datetime
-from StreamToLogger import StreamToLogger
-import logging
-import pandas as pd
+
 import matplotlib.pyplot as plt
+import pandas as pd
 import seaborn as sns
+
+from scripts.logging.StreamToLogger import StreamToLogger
+
 sns.set()
 import sys
 
