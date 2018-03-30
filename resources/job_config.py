@@ -8,3 +8,4 @@ dirname_splitter='__'                                                           
 space_to_save=20 * 1024 * 1024 * 1024                                                                   #20GB
 
 log_file="C:\\Users\\t.yakobidze\\PycharmProjects\\encode_data_loader\\resources\\data_loader.log"
+
