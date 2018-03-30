@@ -11,10 +11,11 @@ from scripts.logging.StreamToLogger import StreamToLogger
 
 sns.set()
 import sys
+import resources.prod_config as cnfg
 
 
 def configure_logger():
-    logging.basicConfig(filename='./data_loader.log',
+    logging.basicConfig(filename=cnfg.log_file,
                         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                         level=logging.DEBUG)
     stdout_logger = logging.getLogger('STDOUT')
@@ -72,12 +73,12 @@ configure_logger()
 start_time = datetime.datetime.now()
 logging.info('The correlation calculation script started at %s', start_time)
 
-transcription_dir = "./data"
-stem_dir = "./stems"
+transcription_dir = cnfg.data_dir
+stem_dir = cnfg.stem_loops_dir
 coverage_name_pattern = re.compile("coverage_table_(chr.*)_\.bed")
-stem_locations = {"S15-30_L0-10_M5": "./stems/S15-30_L0-10_M5",
-                  "S16-50_L0-10_M3": "./stems/S16-50_L0-10_M3",
-                  "S6-15_L0-10_M1": "./stems/S6-15_L0-10_M1"}   # Stem-loops locations
+stem_locations = {"S15-30_L0-10_M5": os.path.join(stem_dir, "S15-30_L0-10_M5"),
+                  "S16-50_L0-10_M3": os.path.join(stem_dir, "S16-50_L0-10_M3"),
+                  "S6-15_L0-10_M1":  os.path.join(stem_dir, "S6-15_L0-10_M1")}   # Stem-loops locations
 
 # Walk through all subdirs in dir
 for path, dirs, files in os.walk(transcription_dir):
