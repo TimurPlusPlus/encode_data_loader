@@ -4,6 +4,7 @@ script_dir="../"
 hg_dir="/home/timur/Desktop/masters/loader_test/hg19/"
 chopped_hg_path=""
 stem_loops_dir="/home/timur/Desktop/masters/loader_test/stem_loops"
+data_sample_dir=data_dir # OR stem_loops_dir
 fetch_chrom_path="/home/timur/Desktop/masters/encode_data_loader/scripts/sh/fetchChromSizes.sh"
 
 log_file="/home/timur/Desktop/masters/loader_test/log.log"

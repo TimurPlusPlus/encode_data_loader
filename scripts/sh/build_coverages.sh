@@ -2,18 +2,18 @@
 
 log=$1
 hg_dir=$2
-stem_loops_dir=$3
+data_sample_dir=$3
 
 now=$(date)
 echo "The build_coverages for stem-loops script started at $now" >> $log
 
-files=$(find $stem_loops_dir -name 'chr*_.bed')
+files=$(find $data_sample_dir -name 'chr*_.bed')
 for file in $files
 do
         echo "A chromosome file $file" >> $log
 
-        file_path="${file%/*}"                  #Get path to chromosome tf file
-        file_name="${file##*/}"                 #Get tf chromosome file name
+        file_path="${file%/*}"                  #Get path to chromosome file
+        file_name="${file##*/}"                 #Get chromosome file name
         hg_file=$hg_dir$file_name
         echo "A hg19 file $hg_file" >> $log
 

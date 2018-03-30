@@ -1,10 +1,10 @@
 import subprocess
 
-import resources.configs.prod_config as cnfg
+import resources.configs.test_config as cnfg
 
 log_file = cnfg.log_file
 hg_dir = cnfg.hg_dir
-stem_loops_dir = cnfg.stem_loops_dir
+data_sample_dir = cnfg.data_sample_dir
 
-subprocess.call(["./sh/build_coverages.sh",
-                 log_file, hg_dir, stem_loops_dir], shell=True)
+subprocess.call(["./sh/build_coverages.sh %s %s %s" %
+                 (log_file, hg_dir, data_sample_dir)], shell=True)
