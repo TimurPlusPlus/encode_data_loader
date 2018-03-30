@@ -1,6 +1,6 @@
 1) data_downloader.py
 2) sort_and_split.py
-3) download and sort the hg19
+3) download_chrom_sizes
 4) chop and split the hg19
 5) build_coverages.py
 6) dataset_builder
