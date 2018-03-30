@@ -1,4 +1,5 @@
 import logging
+import resources.test_config as conf
 
 
 class StreamToLogger(object):
@@ -15,7 +16,7 @@ class StreamToLogger(object):
          self.logger.log(self.log_level, line.rstrip())
 
 logging.basicConfig(
-    filename='./data_loader.log',
+    filename=conf.log_file,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
     level=logging.DEBUG
 )
