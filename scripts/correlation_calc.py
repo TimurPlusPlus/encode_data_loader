@@ -11,7 +11,7 @@ from scripts.logging.StreamToLogger import StreamToLogger
 
 sns.set()
 import sys
-import resources.prod_config as cnfg
+import resources.configs.prod_config as cnfg
 
 
 def configure_logger():

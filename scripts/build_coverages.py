@@ -1,5 +1,6 @@
 import subprocess
-import resources.prod_config as cnfg
+
+import resources.configs.prod_config as cnfg
 
 log_file = cnfg.log_file
 hg_dir = cnfg.hg_dir
