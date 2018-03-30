@@ -9,7 +9,7 @@ import shutil
 import sys
 import urllib
 from multiprocessing.dummy import Pool
-import resources.job_config as conf
+import resources.test_config as conf
 import pandas as pd
 from scripts.logging.StreamToLogger import StreamToLogger
 
