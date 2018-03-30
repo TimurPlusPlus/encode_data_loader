@@ -9,7 +9,7 @@ import shutil
 import sys
 import urllib
 from multiprocessing.dummy import Pool
-import resources.config as conf
+import resources.job_config as conf
 import pandas as pd
 from scripts.logging.StreamToLogger import StreamToLogger
 
@@ -40,7 +40,7 @@ def get_device_available_space(dir_location):
         #return free_bytes.value / 1024 / 1024
         return 100000000000000000000000000000000000000
     disk = os.statvfs(dir_location)
-    return 100000000000000000000000
+    return float(disk.f_bsize*disk.f_bfree)
 
 
 def gunzip(file_path, output_path):
@@ -81,14 +81,18 @@ def build_tree(row):
         os.remove(zipfile_location)
 
 
+def configure_logger():
+    logging.basicConfig(filename=conf.log_file, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                        level=logging.DEBUG)
+    stdout_logger = logging.getLogger('STDOUT')
+    sl = StreamToLogger(stdout_logger, logging.INFO)
+    sys.stdout = sl
+    stderr_logger = logging.getLogger('STDERR')
+    sl = StreamToLogger(stderr_logger, logging.ERROR)
+    sys.stderr = sl
+
 # A logger configuration
-logging.basicConfig(filename=conf.log_file, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.DEBUG)
-stdout_logger = logging.getLogger('STDOUT')
-sl = StreamToLogger(stdout_logger, logging.INFO)
-sys.stdout = sl
-stderr_logger = logging.getLogger('STDERR')
-sl = StreamToLogger(stderr_logger, logging.ERROR)
-sys.stderr = sl
+configure_logger()
 
 start_time = datetime.datetime.now()
 logging.info('The script started at %s', start_time)
