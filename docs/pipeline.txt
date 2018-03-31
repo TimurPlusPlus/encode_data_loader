@@ -6,8 +6,8 @@
 5) build_coverages.py for transcription factor (TF)
 
 6) download stem-loops
-7) sort_and_split.py stem-loops
-5) build_coverages.py for stem-loops
+7) rename to pattern "chr*_.bed"
+7) build_coverages.py for stem-loops
 
 8) dataset_builder
 
