@@ -1,5 +1,5 @@
 import logging
-import resources.configs.test_config as conf
+import resources.configs.prod_config as conf
 
 
 class StreamToLogger(object):
