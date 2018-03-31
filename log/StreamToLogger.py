@@ -1,5 +1,4 @@
-import log
-
+import logging
 import resources.configs.test_config as conf
 
 
@@ -7,7 +6,7 @@ class StreamToLogger(object):
    """
    Fake file-like stream object that redirects writes to a logger instance.
    """
-   def __init__(self, logger, log_level=log.DEBUG):
+   def __init__(self, logger, log_level=logging.DEBUG):
       self.logger = logger
       self.log_level = log_level
       self.linebuf = ''
@@ -16,8 +15,8 @@ class StreamToLogger(object):
       for line in buf.rstrip().splitlines():
          self.logger.log(self.log_level, line.rstrip())
 
-log.basicConfig(
+logging.basicConfig(
     filename=conf.log_file,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=log.DEBUG
+    level=logging.DEBUG
 )
