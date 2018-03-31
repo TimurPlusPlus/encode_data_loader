@@ -1,7 +1,7 @@
 1) data_downloader.py
 2) sort_and_split.py
 
-3) download_chrom_sizes.py
+3) download_chrom_sizes.py and delete as follows (rm chr*_*_*.bed AND rm chrM_.bed)
 4) hg_chop_split.py         Hg19
 
 5) build_coverages.py       For transcription factor (TF)
