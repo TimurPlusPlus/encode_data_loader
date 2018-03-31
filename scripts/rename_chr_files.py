@@ -1,5 +1,5 @@
 import subprocess
-import resources.configs.test_config as cnfg
+import resources.configs.prod_config as cnfg
 
 log = cnfg.log_file
 data_sample_dir=cnfg.data_sample_dir

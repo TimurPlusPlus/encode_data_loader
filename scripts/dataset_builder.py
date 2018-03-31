@@ -1,7 +1,7 @@
 import os
 import re
 import pandas as pd
-import resources.configs.test_config as cnfg
+import resources.configs.prod_config as cnfg
 
 
 hg_dir = cnfg.hg_dir

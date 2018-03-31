@@ -1,6 +1,5 @@
 import subprocess
-
-import resources.configs.test_config as cnfg
+import resources.configs.prod_config as cnfg
 
 chop_size = cnfg.chop_size
 hg_dir = cnfg.hg_dir
