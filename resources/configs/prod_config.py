@@ -5,7 +5,7 @@ hg_dir          = "/home/timurya/hg19/hg19_chroms/"                             
 chopped_hg_path = ""
 stem_loops_dir  = "/home/timurya/stem_loops"
 data_sample_dir = stem_loops_dir    # OR data_dir                               # Processed data dir
-fetch_chrom_path= "/home/timurya/encode_data_loader/scripts/sh/fetchChromSizes.sh"
+fetch_chrom_path= "/home/timurya/encode_data_loader/sh/fetchChromSizes.sh"
 
 labels_dir      = [stem_loops_dir]
 
