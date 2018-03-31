@@ -7,7 +7,7 @@ import pandas as pd
 import seaborn as sns
 
 import logging
-from logging.StreamToLogger import StreamToLogger
+from log.StreamToLogger import StreamToLogger
 
 sns.set()
 import sys

@@ -6,7 +6,7 @@ import sys
 import pandas as pd
 
 import logging
-from logging.StreamToLogger import StreamToLogger
+from log.StreamToLogger import StreamToLogger
 import resources.configs.prod_config as cnfg
 
 hg_dir = cnfg.hg_dir

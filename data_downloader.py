@@ -13,7 +13,7 @@ import pandas as pd
 
 import logging
 import resources.configs.prod_config as conf
-from logging.StreamToLogger import StreamToLogger
+from log.StreamToLogger import StreamToLogger
 
 
 def download(url, file_name):
@@ -84,7 +84,8 @@ def build_tree(row):
 
 
 def configure_logger():
-    logging.basicConfig(filename=conf.log_file, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    logging.basicConfig(filename=conf.log_file,
+                        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                         level=logging.DEBUG)
     stdout_logger = logging.getLogger('STDOUT')
     sl = StreamToLogger(stdout_logger, logging.INFO)
