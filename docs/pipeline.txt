@@ -6,7 +6,7 @@
 5) build_coverages.py for transcription factor (TF)
 
 6) download stem-loops
-7) rename to pattern "chr*_.bed"
+7) rename to pattern "chr*_.bed"        *
 7) build_coverages.py for stem-loops
 
 8) dataset_builder
@@ -17,3 +17,5 @@ Run "chmod +x SCRIPT_NAME.sh" before launching every sh script.
 
 For correlations calculation you must have three directories with stem-loops data in the stem-loops dir.
 It must be named as follows S15-30_L0-10_M5  S16-50_L0-10_M3  S6-15_L0-10_M1.
+
+* - optional

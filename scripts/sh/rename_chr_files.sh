@@ -21,4 +21,4 @@ done
 
 
 now=$(date)
-echo "The build_coverages  script finished at $now" >> $log
+echo "The rename_chr  script finished at $now" >> $log
