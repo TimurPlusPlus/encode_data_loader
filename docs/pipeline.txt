@@ -1,13 +1,14 @@
 1) data_downloader.py
 2) sort_and_split.py
-3) download_chrom_sizes
-4) chop and split the hg19
 
-5) build_coverages.py for transcription factor (TF)
+3) download_chrom_sizes.py
+4) hg_chop_split.py         Hg19
 
-6) download stem-loops
-7) rename to pattern "chr*_.bed"        *
-7) build_coverages.py for stem-loops
+5) build_coverages.py       For transcription factor (TF)
+
+6) download                 Stem-loops
+7) rename_chr_files.py      Rename stem-loops to pattern "chr*_.bed"        *
+7) build_coverages.py       For stem-loops
 
 8) dataset_builder
 

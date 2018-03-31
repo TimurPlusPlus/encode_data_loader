@@ -7,6 +7,8 @@ stem_loops_dir  = "/home/timur/Desktop/masters/loader_test/stem_loops"
 data_sample_dir = stem_loops_dir    # OR data_dir                               # Processed data dir
 fetch_chrom_path= "/home/timur/Desktop/masters/encode_data_loader/scripts/sh/fetchChromSizes.sh"
 
+labels_dir      = [stem_loops_dir]
+
 log_file        = "/home/timur/Desktop/masters/loader_test/log.log"
 
 
