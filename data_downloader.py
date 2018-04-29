@@ -38,9 +38,11 @@ def is_file_changed(file_name, md5):
 def get_device_available_space(dir_location):
     if platform.system() == 'Windows':
         free_bytes = ctypes.c_ulonglong(0)
-        ctypes.windll.kernel32.GetDiskFreeSpaceExW(ctypes.c_wchar_p(dir_location), None, None, ctypes.pointer(free_bytes))
-        #return free_bytes.value / 1024 / 1024
-        return 100000000000000000000000000000000000000
+        ctypes.windll.kernel32\
+            .GetDiskFreeSpaceExW(ctypes.c_wchar_p(dir_location),
+                                 None, None, ctypes.pointer(free_bytes))
+        return free_bytes.value / 1024 / 1024
+        #return 100000000000000000000000000000000000000
     disk = os.statvfs(dir_location)
     return float(disk.f_bsize*disk.f_bfree)
 
@@ -71,7 +73,8 @@ def build_tree(row):
                                  row[first_hierarchy_dir].replace(' ', words_splitter),
                                  row[second_hierarchy_dir].replace(' ', words_splitter),
                                  row[third_hierarchy_dir].replace(' ', words_splitter),
-                                 row['File accession'].replace(' ', words_splitter) + file_extension)
+                                 row['File accession'].replace(' ', words_splitter)
+                                 + file_extension)
     # Check a file existing
     if not os.path.isfile(file_location):
         zipfile_location = file_location + zipfile_extension
@@ -114,8 +117,8 @@ filtered_df = df[df['Assembly'] == assembly]
 filtered_df = filtered_df.drop('Assembly', 1)
 
 # For the testing purpose
-test_df = filtered_df.head(5)
-filtered_df = test_df
+#test_df = filtered_df.head(5)
+#filtered_df = test_df
 #
 logging.debug('First 3 dataframe rows: %s', filtered_df.head(3))
 
