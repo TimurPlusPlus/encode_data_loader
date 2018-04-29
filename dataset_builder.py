@@ -22,12 +22,13 @@ def collect(summary_df, data_dir):
         sample_df = pd.DataFrame(columns=["chr", "start", sample_name])
         for file in files:
             if coverage_name_pattern.match(file):
-                path_to_file = os.path.join(path, file)
-                logging.debug("Data file %s", path_to_file)
-                file_df = pd.read_csv(path_to_file, sep='\t',
-                                      usecols=[0, 1, 3],
-                                      names=["chr", "start", sample_name])
-                sample_df = sample_df.append(file_df)
+                if coverage_name_pattern.match(file).group(1) != "chrM":
+                    path_to_file = os.path.join(path, file)
+                    logging.debug("Data file %s", path_to_file)
+                    file_df = pd.read_csv(path_to_file, sep='\t',
+                                          usecols=[0, 1, 3],
+                                          names=["chr", "start", sample_name])
+                    sample_df = sample_df.append(file_df)
         if not sample_df.empty:
             summary_df = pd.merge(summary_df, sample_df, on=["chr", "start"], how='left')
             logging.info("Data frames have beem merged. Summary df head: %s", summary_df.head())
