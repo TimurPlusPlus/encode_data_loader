@@ -3,9 +3,12 @@ import os
 import re
 
 import logging
+
 import matplotlib.pyplot as plt
+plt.switch_backend('agg')
 import pandas as pd
 import seaborn as sns
+
 sns.set()
 
 
