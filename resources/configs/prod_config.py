@@ -1,4 +1,4 @@
-data_dir        = "/data/encode/data_dir/stem__cell/peaks/ENCSR000AQK"                                      # Root TF dir                           # A root data dir
+data_dir        = "/data/encode/data_dir"                                      # Root TF dir                           # A root data dir
 metadata_file   = "/home/timurya/encode_data_loader/resources/input_data/metadata.tsv"    # Input encode table
 script_dir      = "/home/timurya/encode_data_loader"                            # Current script dir
 hg_dir          = "/home/timurya/hg19/hg19_chroms/"                             # Hg19 dir
