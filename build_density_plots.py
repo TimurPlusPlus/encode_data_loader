@@ -1,6 +1,7 @@
 import datetime as dt
 import os
 import re
+import math as m
 
 import logging
 
@@ -16,6 +17,11 @@ import log.log_configurer as log
 import resources.configs.config as conf
 cnfg = conf.current_config
 
+def log_ratio(x, avg):
+    if x == 0:
+        x += 0.001
+    return m.log(x / avg)
+
 file_name = os.path.basename(__file__)
 log.configure_logger(file_name, cnfg.log_file)
 
@@ -26,6 +32,7 @@ data_dir = cnfg.data_dir
 stem_loop_dir = cnfg.stem_loops_dir
 
 images = {}
+# walk through stem-loops directory
 for path, dirs, files in os.walk(stem_loop_dir):
     for file in files:
         if pattern.match(file):
@@ -33,9 +40,14 @@ for path, dirs, files in os.walk(stem_loop_dir):
             df = pd.read_csv(file_path, sep='\t',
                                            usecols=[1, 3],  # Read start position and coverage
                                            names=["start", "coverage"])
+            # log ratio
+            avg = df['coverage'].mean()
+            df['coverage'] = df['coverage'].apply(lambda x: 5 * log_ratio(x, avg))
             images[pattern.match(file).group(1) + "__" + path.split(os.sep)[-1]] = df
+
 logging.info("Stem-loops are collected")
 
+# walk through transcription factors directory
 for path, dirs, files in os.walk(data_dir):
     sample_name = os.path.basename(os.path.normpath(path))
     for file in files:
@@ -47,6 +59,10 @@ for path, dirs, files in os.walk(data_dir):
                 df = pd.read_csv(file_path, sep='\t',
                                                usecols=[1, 3],  # Read start position and coverage
                                                names=["start", "coverage"])
+                #log ratio
+                avg = df['coverage'].mean()
+                df['coverage'] = df['coverage'].apply(lambda x: 0.5 * log_ratio(x, avg))
+
                 save_dir = os.path.join(path, "density_plots")
                 os.makedirs(save_dir, exist_ok=True)
                 for s in ['S6-15_L0-10_M1', 'S15-30_L0-10_M5', 'S16-50_L0-10_M3']:
@@ -54,8 +70,9 @@ for path, dirs, files in os.walk(data_dir):
                     stem_df = stem_df.merge(df, on='start')
                     stem_df.columns = ['start', 'stem-loop', 'transcription factor']
                     ax = stem_df.plot(x='start', y=['stem-loop', 'transcription factor'])
-                    ax.set_ylabel('density')
-                    ax.set_title("Stem-loop:" + s + " Tf:" + sample_name + " " + chromosome_name)
+                    ax.set_ylabel('signal')
+                    ax.set_ylim([-2, 2])
+                    ax.set_title("Stem-loop:" + s + "    Tf:" + sample_name + "     " + chromosome_name)
                     fig = ax.get_figure()
                     fig.set_size_inches(11.7, 8.27)
                     path_to_save = os.path.join(save_dir, s + "_" + chromosome_name + "_densities.png")
