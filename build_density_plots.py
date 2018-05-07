@@ -71,7 +71,7 @@ for path, dirs, files in os.walk(data_dir):
                     stem_df.columns = ['start', 'stem-loop', 'transcription factor']
                     ax = stem_df.plot(x='start', y=['stem-loop', 'transcription factor'])
                     ax.set_ylabel('signal')
-                    ax.set_ylim([-2, 2])
+                    ax.set_ylim([-2, 1.5])
                     ax.set_title("Stem-loop:" + s + "    Tf:" + sample_name + "     " + chromosome_name)
                     fig = ax.get_figure()
                     fig.set_size_inches(11.7, 8.27)
